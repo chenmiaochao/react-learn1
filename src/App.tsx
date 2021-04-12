@@ -15,6 +15,7 @@ interface State {
 }
 
 class App extends React.Component<Props, State> {
+  //******生命周期第一阶段，   初始化
   constructor(props) {
     super(props);
     this.state = {
@@ -23,12 +24,34 @@ class App extends React.Component<Props, State> {
     };
     
   }
-
+  //在组件创建好dom元素后，挂载页面时候调用
   componentDidMount(){
     fetch("https://jsonplaceholder.typicode.com/users")
     .then(response => response.json())
     .then(data => this.setState({robotGallery: data}));
   }
+
+  //*****生命周期第二阶段：   更新
+  //componentWillReceiveProps 功能是当组件props发生改变后，这个函数会被调用
+  //即将弃用，会发生匪夷所思的事情， 
+  //当一定要使用的时候，可以使用下面的静态函数
+  // state getDerivedStateFromProps(nextProps, preState){}
+
+  //判断UI是否应该更新 
+  //返回值：  boolean
+  // shouldComponentUpdate(nextProps,nextState){
+  //   return nextState.some !== this.state.some
+  // }
+
+  //组件更新后调用
+  componentDidUpdate(){}
+
+
+  //*****生命周期第三阶段：    销毁
+  //组件销毁后调用
+  //可以当析构函数使用 destructor来使用
+  //可以回收监听或者事件 避免组件销毁时内存泄漏
+  componentWillUnmount(){}
 
   render() {
     return (
