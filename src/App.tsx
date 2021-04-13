@@ -7,7 +7,9 @@ import Robot from './components/Robot'
 import ShoppingCart from './components/ShoppingCart'
 
 
-interface Props {}
+interface Props {
+
+}
 
 interface State {
  robotGallery: any[];
@@ -15,26 +17,41 @@ interface State {
 }
 
 
-const App : React.FC = (props)  => {
+const App : React.FC<Props> = (props)  => {
   //数组第一个值是变数， 第二个值是更新函数
   //useState（0）  里面的0 是count的初始值
   const [count, setCount] = useState<number>(0)
   const [robotGallery, setRobotGallery] = useState<any>([])
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>()
 
   useEffect(() => {
     document.title = `点击${count}次`
   },[count])
 
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-    .then(response => response.json())
-    .then(data => setRobotGallery(data));
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+      const response = await fetch("https://jsonplaceholder.typicode.com/users")
+      // .then(response => response.json())
+      // .then(data => setRobotGallery(data));
+      const data = await response.json()
+      setRobotGallery(data)
+      } catch(e){
+        setError(e.message);
+      }
+      setLoading(false)
+    };
+
+    fetchData()
   },[])//空数组 会在UI渲染时 只执行一次
   //如果第二个参数不写， 这个副作用会在每次UI渲染后执行
   //每一次都会setRobotGallery，
   //更新RobotGallery，
   //UI会再次渲染
-  //从而无限循环
+  //从而无限循环 -----> 夺命连环call
+
   return (
     <div className={styles.app}>
       <div className={styles.appHeader}>
@@ -49,16 +66,22 @@ const App : React.FC = (props)  => {
       </button>
       <span>count: {count}</span>
       <ShoppingCart />
-      <div className={styles.robotList}>
+      {(!error || error!=="") && <div>网站出错{error}</div>  }
+      { !loading ? (
+        <div className={styles.robotList}>
         {robotGallery.map( (r) => (
           <Robot id={r.id} name={r.name} email={r.email}/>
         ))}
-      </div>
+        </div>
+      ) : (
+        <h2>loading loading</h2>
+      
+      )}
     </div>
   );
   
   
-}
+};
 
 
 // React17 以后hook的出现  就可以和class 88
